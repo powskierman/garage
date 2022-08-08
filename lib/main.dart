@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 String appTitle = 'Ouvre Porte Garage';
 Color trackColor = Colors.green;
+Color alarmColor = Colors.green;
 
 void main() {
   runApp(const MyApp());
@@ -40,17 +41,11 @@ class _RootPageState extends State<RootPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: const [
-              Icon(Icons.garage_outlined, size: 175, color: Colors.green),
-              Icon(Icons.garage_outlined, size: 175, color: Colors.green),
+              Icon(Icons.garage_outlined, size: 190, color: Colors.green),
+              Icon(Icons.garage_outlined, size: 190, color: Colors.green),
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: const [
-              Icon(Icons.alarm, size: 175, color: Colors.green),
-              SwitchScreen(),
-            ],
-          )
+          const SwitchScreen(),
         ],
       ),
     );
@@ -67,6 +62,7 @@ class SwitchScreen extends StatefulWidget {
 class SwitchClass extends State {
   bool isSwitched = false;
   var textValue = 'Switch is OFF';
+  static Color alarmColor = Colors.green;
 
   Color toggleSwitch(bool value) {
     if (isSwitched == false) {
@@ -74,15 +70,15 @@ class SwitchClass extends State {
         isSwitched = true;
         textValue = 'Alarme       Activé';
         trackColor = Colors.red;
+        alarmColor = trackColor;
       });
-      debugPrint('Switch Button is ON');
     } else {
       setState(() {
         isSwitched = false;
         textValue = 'Alarme Désactivé';
         trackColor = Colors.green;
+        alarmColor = trackColor;
       });
-      debugPrint('Switch Button is OFF');
     }
     return trackColor;
   }
@@ -90,6 +86,7 @@ class SwitchClass extends State {
   @override
   Widget build(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Icon(Icons.alarm, size: 250, color: alarmColor),
       Transform.scale(
           scale: 2.5,
           child: Switch(
@@ -99,12 +96,11 @@ class SwitchClass extends State {
             activeTrackColor: trackColor,
             inactiveThumbColor: Colors.greenAccent,
             inactiveTrackColor: trackColor,
-            //dragStartBehavior: DragStartBehavior.start,
           )),
       Text(
         textValue,
-        style: const TextStyle(fontSize: 20),
-      )
+        style: const TextStyle(fontSize: 24),
+      ),
     ]);
   }
 }
