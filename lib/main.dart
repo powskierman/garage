@@ -9,7 +9,9 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
+
+  //const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -85,22 +87,25 @@ class SwitchClass extends State {
 
   @override
   Widget build(BuildContext context) {
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Icon(Icons.alarm, size: 250, color: alarmColor),
-      Transform.scale(
-          scale: 2.5,
-          child: Switch(
-            onChanged: toggleSwitch,
-            value: isSwitched,
-            activeColor: Colors.redAccent,
-            activeTrackColor: trackColor,
-            inactiveThumbColor: Colors.greenAccent,
-            inactiveTrackColor: trackColor,
-          )),
-      Text(
-        textValue,
-        style: const TextStyle(fontSize: 24),
-      ),
-    ]);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.alarm, size: 250, color: alarmColor),
+        Transform.scale(
+            scale: 2.5,
+            child: Switch(
+              onChanged: toggleSwitch,
+              value: isSwitched,
+              activeColor: Colors.redAccent,
+              activeTrackColor: trackColor,
+              inactiveThumbColor: Colors.greenAccent,
+              inactiveTrackColor: trackColor,
+            )),
+        Text(
+          textValue,
+          style: const TextStyle(fontSize: 24),
+        ),
+      ],
+    );
   }
 }
