@@ -1,17 +1,20 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
+import 'package:mqtt_client/mqtt_client.dart';
+import 'package:garage/mqtt_ctl.dart';
 
 String appTitle = 'Ouvre Porte Garage';
 Color trackColor = Colors.green;
 Color alarmColor = Colors.green;
 
 void main() {
+  connect();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
-  //const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +34,8 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
+  late MqttClient client;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,10 +72,14 @@ class SwitchClass extends State {
   static Color alarmColor = Colors.green;
 
   Color toggleSwitch(bool value) {
+    pubTopic = 'garage/switch';
+    builder.clear();
     if (isSwitched == false) {
       setState(() {
         isSwitched = true;
         textValue = 'Alarme       Activé';
+        builder.addString('1');
+        client.publishMessage(pubTopic, MqttQos.exactlyOnce, builder.payload!);
         trackColor = Colors.red;
         alarmColor = trackColor;
       });
@@ -78,6 +87,8 @@ class SwitchClass extends State {
       setState(() {
         isSwitched = false;
         textValue = 'Alarme Désactivé';
+        builder.addString('0');
+        client.publishMessage(pubTopic, MqttQos.exactlyOnce, builder.payload!);
         trackColor = Colors.green;
         alarmColor = trackColor;
       });
