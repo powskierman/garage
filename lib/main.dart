@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart';
-import 'package:garage/mqtt_ctl.dart';
+import 'package:remote/mqtt_ctl.dart';
 
 String appTitle = 'Ouvre Porte Garage';
 Color trackColor = Colors.green;
@@ -78,7 +78,7 @@ class SwitchClass extends State {
       setState(() {
         isSwitched = true;
         textValue = 'Alarme       Activé';
-        builder.addString('1');
+        builder.addString('ON');
         client.publishMessage(pubTopic, MqttQos.exactlyOnce, builder.payload!);
         trackColor = Colors.red;
         alarmColor = trackColor;
@@ -87,7 +87,7 @@ class SwitchClass extends State {
       setState(() {
         isSwitched = false;
         textValue = 'Alarme Désactivé';
-        builder.addString('0');
+        builder.addString('OFF');
         client.publishMessage(pubTopic, MqttQos.exactlyOnce, builder.payload!);
         trackColor = Colors.green;
         alarmColor = trackColor;

@@ -1,4 +1,4 @@
-package com.example.garage
+package com.example.Remote
 
 import io.flutter.embedding.android.FlutterActivity
 
