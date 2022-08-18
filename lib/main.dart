@@ -34,21 +34,15 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
-  late MqttClient client;
+  //late MqttClient client;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // floatingActionButton:NeumorphicFloatingActionButton(
-      // child: const Icon(Icons.garage_outlined, size: 190, color: Colors.green),
-      // onPressed: (() {
-      //   print("onClick");},
-      //),
       backgroundColor: NeumorphicTheme.baseColor(context),
       appBar: AppBar(
         title: Text(appTitle),
       ),
-
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -57,6 +51,11 @@ class _RootPageState extends State<RootPage> {
             children: [
               NeumorphicButton(
                 onPressed: () {
+                  pubTopic = 'garage/leftDoor';
+                  builder.clear();
+                  builder.addString('ON');
+                  client.publishMessage(
+                      pubTopic, MqttQos.exactlyOnce, builder.payload!);
                   print("leftDoor");
                 },
                 style: NeumorphicStyle(
@@ -68,13 +67,15 @@ class _RootPageState extends State<RootPage> {
                 padding: const EdgeInsets.all(12.0),
                 child: const Icon(Icons.garage_outlined,
                     size: 190, color: Colors.green),
-                // Icon(
-                //   Icons.favorite_border,
-                //   //color: _iconsColor(context),
-                // ),
               ),
               NeumorphicButton(
                 onPressed: () {
+                  pubTopic = 'garage/rightDoor';
+                  builder.clear();
+                  builder.addString('ON');
+                  client.publishMessage(
+                      pubTopic, MqttQos.exactlyOnce, builder.payload!);
+
                   print("rightDoor");
                 },
                 style: NeumorphicStyle(
@@ -86,13 +87,7 @@ class _RootPageState extends State<RootPage> {
                 padding: const EdgeInsets.all(12.0),
                 child: const Icon(Icons.garage_outlined,
                     size: 190, color: Colors.green),
-                // Icon(
-                //   Icons.favorite_border,
-                //   //color: _iconsColor(context),
-                // ),
               ),
-              //Icon(Icons.garage_outlined, size: 190, color: Colors.green),
-              // Icon(Icons.garage_outlined, size: 190, color: Colors.green),
             ],
           ),
           const SwitchScreen(),
