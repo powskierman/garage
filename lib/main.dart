@@ -3,6 +3,8 @@
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:remote/mqtt_ctl.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:remote/value_notifiers.dart';
+//import 'package:dcdg/dcdg.dart';
 
 String appTitle = 'Ouvre Porte Garage';
 Color trackColor = Colors.green;
@@ -35,9 +37,9 @@ class RootPage extends StatefulWidget {
 
 class _RootPageState extends State<RootPage> {
   //late MqttClient client;
-
   @override
   Widget build(BuildContext context) {
+    setState(() {});
     return Scaffold(
       backgroundColor: NeumorphicTheme.baseColor(context),
       appBar: AppBar(
@@ -49,30 +51,36 @@ class _RootPageState extends State<RootPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
+              ValueListenableBuilder(
+                valueListenable: doorColor,
+                builder: (BuildContext context, Color value, Widget? child) {
+                  return Container();
+                },
+              ),
               NeumorphicButton(
                 onPressed: () {
-                  pubTopic = 'garage/leftDoor';
+                  pubTopic = 'garage/leftDoorButton';
                   builder.clear();
-                  builder.addString('ON');
+                  builder.addBool(val: true);
                   client.publishMessage(
                       pubTopic, MqttQos.exactlyOnce, builder.payload!);
-                  print("leftDoor");
+                  print("leftDoor button pressed");
                 },
                 style: NeumorphicStyle(
                   shape: NeumorphicShape.flat,
-                  depth: 20,
+                  depth: 10,
                   boxShape:
                       NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
                 ),
                 padding: const EdgeInsets.all(12.0),
-                child: const Icon(Icons.garage_outlined,
-                    size: 190, color: Colors.green),
+                child: Icon(Icons.garage_outlined,
+                    size: 150, color: leftDoorColor),
               ),
               NeumorphicButton(
                 onPressed: () {
-                  pubTopic = 'garage/rightDoor';
+                  pubTopic = 'garage/rightDoorButton';
                   builder.clear();
-                  builder.addString('ON');
+                  builder.addBool(val: true);
                   client.publishMessage(
                       pubTopic, MqttQos.exactlyOnce, builder.payload!);
 
@@ -80,13 +88,13 @@ class _RootPageState extends State<RootPage> {
                 },
                 style: NeumorphicStyle(
                   shape: NeumorphicShape.flat,
-                  depth: 20,
+                  depth: 10,
                   boxShape:
                       NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
                 ),
                 padding: const EdgeInsets.all(12.0),
                 child: const Icon(Icons.garage_outlined,
-                    size: 190, color: Colors.green),
+                    size: 150, color: Colors.green),
               ),
             ],
           ),
@@ -110,13 +118,13 @@ class SwitchClass extends State {
   static Color alarmColor = Colors.green;
 
   Color toggleSwitch(bool value) {
-    pubTopic = 'garage/switch';
+    pubTopic = 'garage/alarmSwitch';
     builder.clear();
     if (isSwitched == false) {
       setState(() {
         isSwitched = true;
         textValue = 'Alarme       Activé';
-        builder.addString('ON');
+        builder.addBool(val: isSwitched);
         client.publishMessage(pubTopic, MqttQos.exactlyOnce, builder.payload!);
         trackColor = Colors.red;
         alarmColor = trackColor;
@@ -125,7 +133,7 @@ class SwitchClass extends State {
       setState(() {
         isSwitched = false;
         textValue = 'Alarme Désactivé';
-        builder.addString('OFF');
+        builder.addBool(val: isSwitched);
         client.publishMessage(pubTopic, MqttQos.exactlyOnce, builder.payload!);
         trackColor = Colors.green;
         alarmColor = trackColor;
@@ -141,7 +149,7 @@ class SwitchClass extends State {
       children: [
         Icon(Icons.alarm, size: 250, color: alarmColor),
         Transform.scale(
-            scale: 2.5,
+            scale: 2.0,
             child: Switch(
               onChanged: toggleSwitch,
               value: isSwitched,

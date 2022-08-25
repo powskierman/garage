@@ -2,13 +2,22 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
+//import 'value_notifiers.dart';
 
 final client = MqttServerClient('192.168.0.10', 'remote');
 final builder = MqttClientPayloadBuilder();
+//ValueNotifier<Color> leftDoorColor = Colors.green as ValueNotifier<Color>;
+Color leftDoorColor = Colors.green;
+Color rightDoorColor = Colors.green;
+Color alarmColor = Colors.green;
 var pubTopic = 'Remote';
 var pongCount = 0;
+String receivedColor = "GREEN";
+Color gotColor = Colors.green;
+
 Future<int> connect() async {
   client.logging(on: true);
   client.setProtocolV311();
@@ -36,7 +45,6 @@ Future<int> connect() async {
     print('Remote socket exception - $e');
     client.disconnect();
   }
-
   // Are we connected?
   if (client.connectionStatus!.state == MqttConnectionState.connected) {
     print('Remote connected ....');
@@ -47,10 +55,12 @@ Future<int> connect() async {
     exit(-1);
   }
   //Subscribing
-  print('Connecting to Remote topic');
-  const topic = 'Remote';
+  print('Connecting to garage topic');
+  const topic = 'garage';
   client.subscribe(topic, MqttQos.atMostOnce);
-
+  client.subscribe('garage/leftDoorMagStatus', MqttQos.atMostOnce);
+  client.subscribe('garage/rightDoorMagStatus', MqttQos.atMostOnce);
+  client.subscribe('garage/alarmStatus', MqttQos.atMostOnce);
   //Listen for notifiers
   client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
     final recMess = c![0].payload as MqttPublishMessage;
@@ -63,7 +73,16 @@ Future<int> connect() async {
   //Listen to topic for published messages
   client.published!.listen((MqttPublishMessage message) {
     print(
-        'Remote::Published notification:: topic is ${message.variableHeader!.topicName}, with Qos ${message.header!.qos}');
+        'Remote::Published notification:: topic is ${message.variableHeader!.topicName}, content is: ${message.payload.message} with Qos ${message.header!.qos}');
+    newColor(message);
+    //Assign color from message
+
+    // ValueListenableBuilder(
+    //   valueListenable: doorColor,
+    //   builder: (BuildContext context, Color value, Widget? child) {
+    //     return Container();
+    //   },
+    // );
   });
   return 0;
 }
@@ -95,6 +114,30 @@ void onDisconnected() {
 void onConnected() {
   print(
       'Remote::OnConnected client callback - Client connection was successful');
+}
+
+Color newColor(message) {
+  // if (receivedColor == "RED") {
+  //   gotColor = Colors.red;
+  // } else if (receivedColor == "GREEN") {
+  //   gotColor = Colors.green;
+  // }
+
+  if (message.variableHeader!.topicName == "garage/leftDoorMagStatus") {
+    if (MqttPublishPayload.bytesToStringAsString(message.payload.message) ==
+        "1") {
+      print("mag switch is on");
+      leftDoorColor = Colors.green;
+    }
+    if (MqttPublishPayload.bytesToStringAsString(message.payload.message) ==
+        "0") {
+      leftDoorColor = Colors.red;
+      print("mag switch is off");
+    }
+
+    print("It's leftDoorMagStatus");
+  }
+  return leftDoorColor;
 }
 
 /// Pong callback

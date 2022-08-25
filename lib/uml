@@ -1,0 +1,40 @@
+@startuml
+set namespaceSeparator ::
+
+class "remote::main.dart::MyApp" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "remote::main.dart::MyApp"
+
+class "remote::main.dart::RootPage" {
+  +State<RootPage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "remote::main.dart::RootPage"
+
+class "remote::main.dart::_RootPageState" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "remote::main.dart::_RootPageState"
+
+class "remote::main.dart::SwitchScreen" {
+  +SwitchClass createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "remote::main.dart::SwitchScreen"
+
+class "remote::main.dart::SwitchClass" {
+  +bool isSwitched
+  +String textValue
+  {static} +Color alarmColor
+  +Color toggleSwitch()
+  +Widget build()
+}
+
+"remote::main.dart::SwitchClass" o-- "dart::ui::Color"
+"flutter::src::widgets::framework.dart::State" <|-- "remote::main.dart::SwitchClass"
+
+
+@enduml
