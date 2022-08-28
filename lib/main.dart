@@ -1,10 +1,9 @@
 // ignore_for_file: avoid_print
 
 import 'package:mqtt_client/mqtt_client.dart';
-//import 'package:provider/provider.dart';
 import 'package:remote/mqtt_ctl.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-//import 'package:remote/value_notifiers.dart';
+import 'package:remote/value_notifiers.dart';
 import 'package:remote/doors.dart';
 //import 'package:dcdg/dcdg.dart';
 
@@ -12,16 +11,10 @@ String appTitle = 'Ouvre Porte Garage';
 Color trackColor = Colors.green;
 Color alarmColor = Colors.green;
 
-void main() => {
-      connect(),
-      runApp(
-        // ChangeNotifierProvider(
-        //   create: (_) => PostChanges(),
-        //   child:
-        const MyApp(),
-      ),
-      //   ),
-    };
+void main() {
+  connect();
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -48,9 +41,8 @@ class _RootPageState extends State<RootPage> {
 
   callback(varDoor) {
     setState(() {
-      gotColor;
+      leftDoorColor;
       whichDoor = varDoor;
-      print('At callback.$whichDoor is $gotColor');
     });
   }
 
@@ -69,6 +61,12 @@ class _RootPageState extends State<RootPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              ValueListenableBuilder(
+                valueListenable: doorColor,
+                builder: (BuildContext context, Color value, Widget? child) {
+                  return Container();
+                },
+              ),
               Doors(whichDoor: 'leftDoor', callback: callback),
               Doors(whichDoor: 'rightDoor', callback: callback),
             ],
