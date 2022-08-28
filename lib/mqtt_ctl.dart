@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
+
+import 'doors.dart';
 //import 'value_notifiers.dart';
 
 final client = MqttServerClient('192.168.0.10', 'remote');
@@ -14,6 +16,8 @@ Color leftDoorColor = Colors.green;
 Color rightDoorColor = Colors.green;
 Color alarmColor = Colors.green;
 var pubTopic = 'Remote';
+var recTopic = 'noDoor';
+//var whichDoor = 'noDoor';
 var pongCount = 0;
 String receivedColor = "GREEN";
 Color gotColor = Colors.green;
@@ -58,23 +62,38 @@ Future<int> connect() async {
   print('Connecting to garage topic');
   const topic = 'garage';
   client.subscribe(topic, MqttQos.atMostOnce);
-  client.subscribe('garage/leftDoorMagStatus', MqttQos.atMostOnce);
-  client.subscribe('garage/rightDoorMagStatus', MqttQos.atMostOnce);
+  client.subscribe('garage/leftDoorMagSwitch', MqttQos.atMostOnce);
+  client.subscribe('garage/rightDoorMagSwitch', MqttQos.atMostOnce);
   client.subscribe('garage/alarmStatus', MqttQos.atMostOnce);
   //Listen for notifiers
   client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
     final recMess = c![0].payload as MqttPublishMessage;
+    //  recTopic = c[0].topic as MqttPublishMessage;
     final pt =
         MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
     print(
         'Remote change notification:: topic is <${c[0].topic}>, payload is <-- $pt-->');
-  });
+    print('recMess.payload.message is ${recMess.payload.message}');
+    print('recTopic is $recTopic');
+    if (recTopic == 'garage/leftDoorMagSwitch') {
+      var callback;
+      Doors(whichDoor: 'leftDoor', callback: callback);
+    }
+    if (recTopic == 'garage/rightDoorMagSwitch') {
+      print('Received topic is: $recTopic');
+      print('Payload is: $pt');
 
-  //Listen to topic for published messages
-  client.published!.listen((MqttPublishMessage message) {
-    print(
-        'Remote::Published notification:: topic is ${message.variableHeader!.topicName}, content is: ${message.payload.message} with Qos ${message.header!.qos}');
-    newColor(message);
+      newColor(pt);
+      print('gotColor is: $gotColor');
+    }
+
+    //Listen to topic for published messages
+    client.published!.listen((MqttPublishMessage message) {
+      recTopic = message.variableHeader!.topicName;
+      print(
+          'Remote::Published notification:: topic is $recTopic, content is: ${message.payload.message} with Qos ${message.header!.qos}');
+    });
+
     //Assign color from message
 
     // ValueListenableBuilder(
@@ -117,24 +136,14 @@ void onConnected() {
 }
 
 Color newColor(message) {
-  // if (receivedColor == "RED") {
-  //   gotColor = Colors.red;
-  // } else if (receivedColor == "GREEN") {
-  //   gotColor = Colors.green;
-  // }
+  if (message == "RED") {
+    gotColor = Colors.red;
+  } else if (message == "GREEN") {
+    gotColor = Colors.green;
+  }
 
-  if (message.variableHeader!.topicName == "garage/leftDoorMagStatus") {
-    if (MqttPublishPayload.bytesToStringAsString(message.payload.message) ==
-        "1") {
-      print("mag switch is on");
-      leftDoorColor = Colors.green;
-    }
-    if (MqttPublishPayload.bytesToStringAsString(message.payload.message) ==
-        "0") {
-      leftDoorColor = Colors.red;
-      print("mag switch is off");
-    }
-
+  if (recTopic == "garage/leftDoorMagSwitch") {
+    leftDoorColor = gotColor;
     print("It's leftDoorMagStatus");
   }
   return leftDoorColor;

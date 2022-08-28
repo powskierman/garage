@@ -1,19 +1,27 @@
 // ignore_for_file: avoid_print
 
 import 'package:mqtt_client/mqtt_client.dart';
+//import 'package:provider/provider.dart';
 import 'package:remote/mqtt_ctl.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:remote/value_notifiers.dart';
+//import 'package:remote/value_notifiers.dart';
+import 'package:remote/doors.dart';
 //import 'package:dcdg/dcdg.dart';
 
 String appTitle = 'Ouvre Porte Garage';
 Color trackColor = Colors.green;
 Color alarmColor = Colors.green;
 
-void main() {
-  connect();
-  runApp(const MyApp());
-}
+void main() => {
+      connect(),
+      runApp(
+        // ChangeNotifierProvider(
+        //   create: (_) => PostChanges(),
+        //   child:
+        const MyApp(),
+      ),
+      //   ),
+    };
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -36,6 +44,16 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
+  String whichDoor = 'leftDoor';
+
+  callback(varDoor) {
+    setState(() {
+      gotColor;
+      whichDoor = varDoor;
+      print('At callback.$whichDoor is $gotColor');
+    });
+  }
+
   //late MqttClient client;
   @override
   Widget build(BuildContext context) {
@@ -49,53 +67,10 @@ class _RootPageState extends State<RootPage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ValueListenableBuilder(
-                valueListenable: doorColor,
-                builder: (BuildContext context, Color value, Widget? child) {
-                  return Container();
-                },
-              ),
-              NeumorphicButton(
-                onPressed: () {
-                  pubTopic = 'garage/leftDoorButton';
-                  builder.clear();
-                  builder.addBool(val: true);
-                  client.publishMessage(
-                      pubTopic, MqttQos.exactlyOnce, builder.payload!);
-                  print("leftDoor button pressed");
-                },
-                style: NeumorphicStyle(
-                  shape: NeumorphicShape.flat,
-                  depth: 10,
-                  boxShape:
-                      NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
-                ),
-                padding: const EdgeInsets.all(12.0),
-                child: Icon(Icons.garage_outlined,
-                    size: 150, color: leftDoorColor),
-              ),
-              NeumorphicButton(
-                onPressed: () {
-                  pubTopic = 'garage/rightDoorButton';
-                  builder.clear();
-                  builder.addBool(val: true);
-                  client.publishMessage(
-                      pubTopic, MqttQos.exactlyOnce, builder.payload!);
-
-                  print("rightDoor");
-                },
-                style: NeumorphicStyle(
-                  shape: NeumorphicShape.flat,
-                  depth: 10,
-                  boxShape:
-                      NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
-                ),
-                padding: const EdgeInsets.all(12.0),
-                child: const Icon(Icons.garage_outlined,
-                    size: 150, color: Colors.green),
-              ),
+              Doors(whichDoor: 'leftDoor', callback: callback),
+              Doors(whichDoor: 'rightDoor', callback: callback),
             ],
           ),
           const SwitchScreen(),
