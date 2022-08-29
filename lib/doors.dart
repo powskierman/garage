@@ -7,9 +7,7 @@ import 'mqtt_ctl.dart';
 
 class Doors extends StatefulWidget {
   final String whichDoor;
-  final Function callback;
-
-  const Doors({super.key, required this.whichDoor, required this.callback});
+  const Doors({super.key, required this.whichDoor});
 
   @override
   DoorsState createState() => DoorsState();
@@ -40,19 +38,11 @@ class DoorsState extends State<Doors> {
   }
 }
 
-class MagSwitches extends StatefulWidget {
-  const MagSwitches({super.key});
+class NotifyMagSwitches extends ChangeNotifier {
+  Color magColor = Colors.purple;
 
-  final bool leftDoorMagSwitch = true;
-  final bool rightDoorMagSwitch = true;
-
-  @override
-  State<MagSwitches> createState() => _MagSwitchesState();
-}
-
-class _MagSwitchesState extends State<MagSwitches> {
-  @override
-  Widget build(BuildContext context) {
-    return Container();
+  void changeColor(Color newMagColor) {
+    magColor = newMagColor;
+    notifyListeners();
   }
 }

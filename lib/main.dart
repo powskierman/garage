@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:mqtt_client/mqtt_client.dart';
+import 'package:provider/provider.dart';
 import 'package:remote/mqtt_ctl.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:remote/value_notifiers.dart';
@@ -8,12 +9,15 @@ import 'package:remote/doors.dart';
 //import 'package:dcdg/dcdg.dart';
 
 String appTitle = 'Ouvre Porte Garage';
-Color trackColor = Colors.green;
-Color alarmColor = Colors.green;
 
 void main() {
   connect();
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => NotifyMagSwitches(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -37,19 +41,11 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
-  String whichDoor = 'leftDoor';
-
-  callback(varDoor) {
-    setState(() {
-      leftDoorColor;
-      whichDoor = varDoor;
-    });
-  }
+  String whichDoor = 'noDoor';
 
   //late MqttClient client;
   @override
   Widget build(BuildContext context) {
-    setState(() {});
     return Scaffold(
       backgroundColor: NeumorphicTheme.baseColor(context),
       appBar: AppBar(
@@ -60,15 +56,15 @@ class _RootPageState extends State<RootPage> {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ValueListenableBuilder(
-                valueListenable: doorColor,
-                builder: (BuildContext context, Color value, Widget? child) {
-                  return Container();
-                },
-              ),
-              Doors(whichDoor: 'leftDoor', callback: callback),
-              Doors(whichDoor: 'rightDoor', callback: callback),
+            children: const [
+              // ValueListenableBuilder(
+              //   valueListenable: doorColor,
+              //   builder: (BuildContext context, Color value, Widget? child) {
+              //     return Container();
+              //   },
+              // ),
+              Doors(whichDoor: 'leftDoor'),
+              Doors(whichDoor: 'rightDoor'),
             ],
           ),
           const SwitchScreen(),

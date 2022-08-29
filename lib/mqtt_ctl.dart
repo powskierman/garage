@@ -5,22 +5,24 @@ import 'dart:io';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
+//import 'package:provider/provider.dart';
+//import 'package:remote/doors.dart';
 
-import 'doors.dart';
+//import 'doors.dart';
 //import 'value_notifiers.dart';
 
 final client = MqttServerClient('192.168.0.10', 'remote');
 final builder = MqttClientPayloadBuilder();
 //ValueNotifier<Color> leftDoorColor = Colors.green as ValueNotifier<Color>;
-Color leftDoorColor = Colors.green;
-Color rightDoorColor = Colors.green;
-Color alarmColor = Colors.green;
+Color leftDoorColor = Colors.blue;
+Color rightDoorColor = Colors.blue;
+Color alarmColor = Colors.blue;
 var pubTopic = 'Remote';
 var recTopic = 'noDoor';
 //var whichDoor = 'noDoor';
 var pongCount = 0;
-String receivedColor = "GREEN";
-Color gotColor = Colors.green;
+String receivedColor = "BLUE";
+Color gotColor = Colors.blue;
 
 Future<int> connect() async {
   client.logging(on: true);
@@ -65,25 +67,26 @@ Future<int> connect() async {
   client.subscribe('garage/leftDoorMagSwitch', MqttQos.atMostOnce);
   client.subscribe('garage/rightDoorMagSwitch', MqttQos.atMostOnce);
   client.subscribe('garage/alarmStatus', MqttQos.atMostOnce);
+
   //Listen for notifiers
   client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
     final recMess = c![0].payload as MqttPublishMessage;
     //  recTopic = c[0].topic as MqttPublishMessage;
     final pt =
         MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+    newColor(pt);
     print(
         'Remote change notification:: topic is <${c[0].topic}>, payload is <-- $pt-->');
     print('recMess.payload.message is ${recMess.payload.message}');
     print('recTopic is $recTopic');
     if (recTopic == 'garage/leftDoorMagSwitch') {
-      var callback;
-      Doors(whichDoor: 'leftDoor', callback: callback);
+      //  const Doors(whichDoor: 'leftDoor');
     }
     if (recTopic == 'garage/rightDoorMagSwitch') {
+      newColor(pt);
+      //  const Doors(whichDoor: 'rightDoor');
       print('Received topic is: $recTopic');
       print('Payload is: $pt');
-
-      newColor(pt);
       print('gotColor is: $gotColor');
     }
 
@@ -141,11 +144,13 @@ Color newColor(message) {
   } else if (message == "GREEN") {
     gotColor = Colors.green;
   }
+  print('[150] gotColor: $gotColor]');
 
   if (recTopic == "garage/leftDoorMagSwitch") {
     leftDoorColor = gotColor;
     print("It's leftDoorMagStatus");
   }
+
   return leftDoorColor;
 }
 
